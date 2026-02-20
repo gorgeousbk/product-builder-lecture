@@ -32,37 +32,64 @@ function getColorClass(number) {
 function createNumberDiv(number) {
     const numberDiv = document.createElement('div');
     numberDiv.classList.add('number');
-    numberDiv.classList.add(getColorClass(number));
-    numberDiv.textContent = number;
+    // We don't add the color class yet for the "drawing" state
     return numberDiv;
 }
 
-generateBtn.addEventListener('click', () => {
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+generateBtn.addEventListener('click', async () => {
+    generateBtn.disabled = true;
     numbersContainer.innerHTML = '';
     const numbers = new Set();
     
-    // Generate 6 main numbers
+    // Generate all numbers first
     while (numbers.size < 6) {
         numbers.add(Math.floor(Math.random() * 45) + 1);
     }
-    
-    // Sort and display main numbers
     const sortedNumbers = Array.from(numbers).sort((a, b) => a - b);
-    sortedNumbers.forEach(number => {
-        numbersContainer.appendChild(createNumberDiv(number));
-    });
-
-    // Add "+" separator for bonus number
-    const separator = document.createElement('div');
-    separator.classList.add('bonus-separator');
-    separator.textContent = '+';
-    numbersContainer.appendChild(separator);
-
-    // Generate and display 1 bonus number
+    
     let bonusNumber;
     do {
         bonusNumber = Math.floor(Math.random() * 45) + 1;
     } while (numbers.has(bonusNumber));
+
+    // Draw main numbers one by one
+    for (let i = 0; i < sortedNumbers.length; i++) {
+        const num = sortedNumbers[i];
+        const ball = createNumberDiv();
+        ball.classList.add('drawing');
+        numbersContainer.appendChild(ball);
+        
+        await sleep(600); // Wait while "spinning"
+        
+        ball.classList.remove('drawing');
+        ball.classList.add('reveal');
+        ball.classList.add(getColorClass(num));
+        ball.textContent = num;
+        
+        await sleep(200); // Small pause before next ball
+    }
+
+    // Draw separator
+    const separator = document.createElement('div');
+    separator.classList.add('bonus-separator');
+    separator.textContent = '+';
+    numbersContainer.appendChild(separator);
+    await sleep(100);
+    separator.classList.add('visible');
+
+    // Draw bonus number
+    const bonusBall = createNumberDiv();
+    bonusBall.classList.add('drawing');
+    numbersContainer.appendChild(bonusBall);
     
-    numbersContainer.appendChild(createNumberDiv(bonusNumber));
+    await sleep(800); // Bonus ball takes a bit longer
+    
+    bonusBall.classList.remove('drawing');
+    bonusBall.classList.add('reveal');
+    bonusBall.classList.add(getColorClass(bonusNumber));
+    bonusBall.textContent = bonusNumber;
+
+    generateBtn.disabled = false;
 });

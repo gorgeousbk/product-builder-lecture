@@ -13,7 +13,7 @@ themeBtn.addEventListener('click', () => {
 });
 
 function updateThemeButton(theme) {
-    themeBtn.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    themeBtn.textContent = theme === 'dark' ? '☀️ 라이트 모드' : '🌙 다크 모드';
 }
 
 // Load saved theme
